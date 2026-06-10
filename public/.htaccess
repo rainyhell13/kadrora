@@ -1,0 +1,10 @@
+Options -Indexes
+RewriteEngine On
+
+# Статика отдаётся напрямую
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Всё остальное → index.php
+RewriteRule ^(.*)$ index.php [QSA,L]

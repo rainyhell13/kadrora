@@ -1,0 +1,23 @@
+# Загружаемые пользователями файлы (не хранятся в репозитории)
+public/uploads/avatars/*
+public/uploads/photos/*
+public/uploads/video/*
+public/uploads/docs/*
+!public/uploads/avatars/.gitkeep
+!public/uploads/photos/.gitkeep
+!public/uploads/video/.gitkeep
+!public/uploads/docs/.gitkeep
+
+# Флаг автоинициализации БД (создаётся при первом запуске)
+database/.initialized
+
+# Системное / редакторы
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+
+# Зависимости (если появятся)
+/vendor-dev/
+node_modules/
