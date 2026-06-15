@@ -9,7 +9,7 @@ class Comment extends Model
                     (SELECT COUNT(*) FROM comment_likes cl WHERE cl.comment_id = c.id) AS likes_count
              FROM comments c
              JOIN users u ON u.id = c.user_id
-             WHERE c.post_id = ? AND c.parent_id IS NULL
+             WHERE c.post_id = ? AND c.parent_id IS NULL AND c.status NOT IN ('hidden','removed')
              ORDER BY c.created_at ASC",
             [$postId]
         );

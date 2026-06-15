@@ -29,7 +29,21 @@ class CommentController extends Controller
             return;
         }
 
+        // Модерация комментария
+        if ($this->isMuted()) {
+            $this->json(['error' => 'Вам временно запрещены комментарии'], 403);
+            return;
+        }
+        $hit = $this->moderateText($content);
+        if ($hit && $hit['action'] === 'block') {
+            $this->json(['error' => 'Комментарий содержит недопустимое содержимое'], 422);
+            return;
+        }
+
         $commentId = $this->commentModel->create($postId, $uid, $content, $parentId);
+        if ($hit && $hit['action'] === 'flag') {
+            Database::getConnection()->prepare("UPDATE comments SET status='flagged' WHERE id=?")->execute([$commentId]);
+        }
         $comment   = $this->commentModel->findById($commentId);
 
         $post = $this->postModel->findById($postId);

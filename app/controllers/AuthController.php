@@ -34,8 +34,13 @@ class AuthController extends Controller
             return;
         }
 
-        if ($user['is_banned']) {
-            $this->view('auth/login', ['error' => 'Ваш аккаунт заблокирован', 'csrf' => $this->csrf()], 'auth');
+        if ($this->userModel->isCurrentlyBanned($user)) {
+            $msg = 'Ваш аккаунт заблокирован';
+            if (!empty($user['ban_reason'])) $msg .= '. Причина: ' . $user['ban_reason'];
+            if (empty($user['is_banned']) && !empty($user['banned_until'])) {
+                $msg .= '. Разблокировка: ' . date('d.m.Y H:i', strtotime($user['banned_until']));
+            }
+            $this->view('auth/login', ['error' => $msg, 'csrf' => $this->csrf()], 'auth');
             return;
         }
 

@@ -147,3 +147,24 @@ function toggleBookmark(postId, btn) {
       res.bookmarked ? 'success' : 'info');
   });
 }
+
+/* ---- Жалобы ---- */
+function openReport(type, id) {
+  document.getElementById('reportType').value = type;
+  document.getElementById('reportTargetId').value = id;
+  document.getElementById('reportCategory').value = 'spam';
+  document.getElementById('reportComment').value = '';
+  new bootstrap.Modal(document.getElementById('reportModal')).show();
+}
+function submitReport() {
+  const type = document.getElementById('reportType').value;
+  const id   = document.getElementById('reportTargetId').value;
+  postAction(BASE_URL + '/report', {
+    target_type: type, target_id: id,
+    category: document.getElementById('reportCategory').value,
+    comment: document.getElementById('reportComment').value.trim(),
+  }, () => {
+    bootstrap.Modal.getInstance(document.getElementById('reportModal'))?.hide();
+    showToast('Жалоба отправлена. Спасибо!', 'success');
+  });
+}

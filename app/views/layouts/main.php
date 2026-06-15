@@ -16,6 +16,9 @@ $unreadN  = $uid ? (new Notification())->getUnreadCount($uid)  : 0;
 $unreadM  = $uid ? (new Message())->getTotalUnread($uid)        : 0;
 $meNav    = $uid ? (new User())->findById($uid)                 : null;
 $pendingF = $uid ? count((new Friendship())->getPendingRequests($uid)) : 0;
+$navRole  = $meNav['role'] ?? 'user';
+$isStaff  = in_array($navRole, ['moderator','admin'], true);
+$pendingR = $isStaff ? (new Report())->pendingCount() : 0;
 ?>
 
 <!-- ====== NAVBAR ====== -->
@@ -117,6 +120,14 @@ $pendingF = $uid ? count((new Friendship())->getPendingRequests($uid)) : 0;
                 <i class="bi bi-gear me-2 text-accent"></i>Настройки
               </a>
             </li>
+            <?php if ($isStaff): ?>
+            <li>
+              <a class="dropdown-item" href="<?= BASE_URL ?>/admin">
+                <i class="bi bi-shield-shaded me-2 text-accent"></i>Панель модерации
+                <?php if ($pendingR > 0): ?><span class="badge bg-danger ms-1"><?= $pendingR ?></span><?php endif; ?>
+              </a>
+            </li>
+            <?php endif; ?>
             <li><hr class="dropdown-divider"></li>
             <li>
               <a class="dropdown-item text-danger" href="<?= BASE_URL ?>/logout">
@@ -152,6 +163,37 @@ $pendingF = $uid ? count((new Friendship())->getPendingRequests($uid)) : 0;
     <?php else: ?>
       <?= $content ?>
     <?php endif; ?>
+  </div>
+</div>
+
+<!-- Report modal -->
+<div class="modal fade" id="reportModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title fw-bold"><i class="bi bi-flag me-2" style="color:var(--danger)"></i>Пожаловаться</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="reportType"><input type="hidden" id="reportTargetId">
+        <label class="form-label">Причина жалобы</label>
+        <select id="reportCategory" class="form-select mb-3">
+          <option value="spam">Спам или реклама</option>
+          <option value="insult">Оскорбления, травля</option>
+          <option value="violence">Насилие, угрозы</option>
+          <option value="adult">Порнография (18+)</option>
+          <option value="fraud">Мошенничество</option>
+          <option value="hate">Разжигание вражды</option>
+          <option value="other">Другое</option>
+        </select>
+        <label class="form-label">Комментарий (необязательно)</label>
+        <textarea id="reportComment" class="form-control" rows="2" placeholder="Опишите проблему..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="button" class="btn btn-danger" onclick="submitReport()"><i class="bi bi-flag me-1"></i>Отправить жалобу</button>
+      </div>
+    </div>
   </div>
 </div>
 

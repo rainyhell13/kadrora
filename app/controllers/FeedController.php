@@ -64,6 +64,22 @@ class FeedController extends Controller
             return;
         }
 
+        // Модерация: запрет публикации (mute)
+        if ($this->isMuted()) {
+            $this->json(['error' => 'Вам временно запрещена публикация записей'], 403);
+            return;
+        }
+        // Автофильтр стоп-слов
+        $flag = false;
+        if ($content !== '') {
+            $hit = $this->moderateText($content);
+            if ($hit && $hit['action'] === 'block') {
+                $this->json(['error' => 'Запись содержит недопустимое содержимое и не может быть опубликована'], 422);
+                return;
+            }
+            $flag = $hit && $hit['action'] === 'flag';
+        }
+
         $image = null;
         if (!empty($_FILES['image']['name'])) {
             try {
@@ -76,6 +92,10 @@ class FeedController extends Controller
         }
 
         $postId = $this->postModel->create($uid, $content, $image, $privacy);
+        // Помеченная запись — на проверку модерации (видна автору, но помечена)
+        if ($flag) {
+            Database::getConnection()->prepare("UPDATE posts SET status='flagged' WHERE id=?")->execute([$postId]);
+        }
         $post   = $this->postModel->findById($postId);
 
         $html = $this->renderView('feed/partials/post_card', [

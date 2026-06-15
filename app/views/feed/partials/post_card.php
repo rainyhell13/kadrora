@@ -52,6 +52,19 @@ $csrf = $csrf ?? $_SESSION['csrf_token'] ?? '';
         </li>
       </ul>
     </div>
+    <?php else: ?>
+    <div class="dropdown">
+      <button class="btn btn-sm border-0 px-2" data-bs-toggle="dropdown" style="background:none;color:var(--text-muted)">
+        <i class="bi bi-three-dots"></i>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li>
+          <button class="dropdown-item text-danger" onclick="openReport('post', <?= $post['id'] ?>)">
+            <i class="bi bi-flag me-2"></i>Пожаловаться
+          </button>
+        </li>
+      </ul>
+    </div>
     <?php endif; ?>
   </div>
 

@@ -74,6 +74,7 @@ class Database
                 $db->exec(file_get_contents(__DIR__ . '/../database/profile_features.sql'));
                 $db->exec(file_get_contents(__DIR__ . '/../database/bookmarks_documents.sql'));
                 $db->exec(file_get_contents(__DIR__ . '/../database/privacy_social.sql'));
+                $db->exec(file_get_contents(__DIR__ . '/../database/moderation.sql'));
             }
 
             // Ставим флаг — больше не проверяем

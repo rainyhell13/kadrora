@@ -50,6 +50,41 @@ abstract class Controller
         return $_SESSION['user_id'] ?? null;
     }
 
+    protected function currentUserRole(): string
+    {
+        if (!isset($_SESSION['user_id'])) return 'guest';
+        return (new User())->getRole($_SESSION['user_id']);
+    }
+
+    protected function isStaff(): bool
+    {
+        return in_array($this->currentUserRole(), ['moderator', 'admin'], true);
+    }
+
+    /** Доступ только модераторам и администраторам */
+    protected function requireStaff(): void
+    {
+        $this->requireAuth();
+        if (!$this->isStaff()) {
+            if ($this->isAjax()) $this->json(['error' => 'Доступ запрещён'], 403);
+            http_response_code(403);
+            $this->view('errors/403', [], 'main');
+            exit;
+        }
+    }
+
+    /** Доступ только администраторам */
+    protected function requireAdmin(): void
+    {
+        $this->requireAuth();
+        if ($this->currentUserRole() !== 'admin') {
+            if ($this->isAjax()) $this->json(['error' => 'Только для администраторов'], 403);
+            http_response_code(403);
+            $this->view('errors/403', [], 'main');
+            exit;
+        }
+    }
+
     protected function isAjax(): bool
     {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH'])
@@ -142,6 +177,22 @@ abstract class Controller
         }
 
         return $filename;
+    }
+
+    /** Заблокирован ли текущий пользователь на публикацию (mute) */
+    protected function isMuted(): bool
+    {
+        $u = (new User())->findById($this->currentUserId());
+        return $u && (new User())->isCurrentlyMuted($u);
+    }
+
+    /**
+     * Проверка текста автофильтром стоп-слов.
+     * Возвращает ['action'=>'block'|'flag','word'=>...] либо null.
+     */
+    protected function moderateText(string $text): ?array
+    {
+        return (new BannedWord())->check($text);
     }
 
     protected function flash(string $type, string $message): void

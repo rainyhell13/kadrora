@@ -173,6 +173,10 @@ $theyAsked= $isPending && (int)$fs['addressee'] === (int)$me['id'];
                     onclick="togglePersonBookmark(<?= $profile['id'] ?>, this)">
               <i class="bi bi-bookmark<?= $isBookmarked ? '-star-fill' : '' ?>"></i>
             </button>
+            <button class="btn btn-outline-secondary btn-sm" title="Пожаловаться"
+                    onclick="openReport('user', <?= $profile['id'] ?>)">
+              <i class="bi bi-flag"></i>
+            </button>
             <?php endif; ?>
           </div>
         </div>

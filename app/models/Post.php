@@ -51,7 +51,7 @@ class Post extends Model
                     (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count
              FROM posts p
              JOIN users u ON u.id = p.user_id
-             WHERE (
+             WHERE p.status NOT IN ('hidden','removed') AND (
                  p.user_id = ?
                  OR (
                      p.user_id IN (
@@ -80,6 +80,7 @@ class Post extends Model
              JOIN users u  ON u.id  = p.user_id
              JOIN users wo ON wo.id = p.wall_owner_id
              WHERE p.wall_owner_id = ?
+               AND p.status NOT IN ('hidden','removed')
                AND (
                    p.privacy = 'public'
                    OR p.user_id = ?
@@ -149,7 +150,7 @@ class Post extends Model
              FROM posts p
              JOIN users u  ON u.id  = p.user_id
              JOIN users wo ON wo.id = p.wall_owner_id
-             WHERE p.privacy = 'public' AND lower(p.content) LIKE ?
+             WHERE p.privacy = 'public' AND p.status NOT IN ('hidden','removed') AND lower(p.content) LIKE ?
              ORDER BY p.created_at DESC
              LIMIT ?",
             [$viewerId, $viewerId, $q, $limit]
@@ -168,7 +169,7 @@ class Post extends Model
              FROM posts p
              JOIN users u  ON u.id  = p.user_id
              JOIN users wo ON wo.id = p.wall_owner_id
-             WHERE p.privacy = 'public' AND p.wall_owner_id = p.user_id
+             WHERE p.privacy = 'public' AND p.wall_owner_id = p.user_id AND p.status NOT IN ('hidden','removed')
              ORDER BY RANDOM()
              LIMIT ?",
             [$viewerId, $viewerId, $limit]

@@ -83,6 +83,22 @@ $router->get('/documents/{id}/download',   'DocumentController', 'download');
 // Theme (тёмная/светлая)
 $router->post('/theme/set',        'ThemeController', 'set');
 
+// Reports (жалобы)
+$router->post('/report',           'ReportController', 'create');
+
+// Admin / Moderation
+$router->get('/admin',                   'AdminController', 'dashboard');
+$router->get('/admin/reports',           'AdminController', 'reports');
+$router->post('/admin/report/resolve',   'AdminController', 'resolveReport');
+$router->get('/admin/users',             'AdminController', 'users');
+$router->post('/admin/user/action',      'AdminController', 'userAction');
+$router->get('/admin/content',           'AdminController', 'content');
+$router->post('/admin/content/action',   'AdminController', 'contentAction');
+$router->get('/admin/words',             'AdminController', 'words');
+$router->post('/admin/words/add',        'AdminController', 'wordAdd');
+$router->post('/admin/words/remove',     'AdminController', 'wordRemove');
+$router->get('/admin/log',               'AdminController', 'log');
+
 // Friends
 $router->get('/friends',           'FriendController', 'index');
 $router->post('/friend/add',       'FriendController', 'sendRequest');
