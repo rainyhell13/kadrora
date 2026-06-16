@@ -46,6 +46,12 @@
               <i class="bi bi-plus-circle me-1"></i>Вступить
             </button>
             <?php endif; ?>
+            <?php if ((int)$group['owner_id'] !== (int)$me['id']): ?>
+            <button class="btn btn-outline-secondary btn-sm" title="Пожаловаться"
+                    onclick="openReport('group', <?= $group['id'] ?>)">
+              <i class="bi bi-flag"></i>
+            </button>
+            <?php endif; ?>
           </div>
         </div>
         <h3 class="fw-bold mt-2 mb-0" style="color:var(--text-primary)">

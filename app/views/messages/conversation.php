@@ -77,11 +77,29 @@
       <?php endforeach; ?>
     </div>
 
+    <!-- Превью прикреплённого фото -->
+    <div id="msgAttachPreview" class="msg-attach-preview d-none">
+      <div class="position-relative d-inline-block">
+        <img id="msgAttachThumb" src="" alt="">
+        <button type="button" class="msg-attach-remove" onclick="clearMsgAttach()" title="Убрать">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+      <span class="msg-attach-name" id="msgAttachName"></span>
+    </div>
+
     <div class="chat-input-area">
-      <label class="btn btn-outline-secondary btn-sm border-0 mb-0 p-2" for="msgImageInput">
-        <i class="bi bi-image" style="font-size:1.1rem"></i>
-      </label>
-      <input type="file" id="msgImageInput" class="d-none" accept="image/*">
+      <div class="dropdown dropup">
+        <button class="chat-attach-btn" type="button" data-bs-toggle="dropdown" title="Прикрепить">
+          <i class="bi bi-paperclip"></i>
+        </button>
+        <ul class="dropdown-menu">
+          <li><button class="dropdown-item" type="button" onclick="document.getElementById('msgImageInput').click()">
+            <i class="bi bi-image me-2 text-accent"></i>Фотография
+          </button></li>
+        </ul>
+      </div>
+      <input type="file" id="msgImageInput" class="d-none" accept="image/*" onchange="previewMsgAttach(this)">
       <input type="text" id="msgInput" class="chat-input"
              placeholder="Написать сообщение..."
              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}">
@@ -103,6 +121,24 @@ function scrollToBottom() {
 }
 scrollToBottom();
 
+function previewMsgAttach(input) {
+  if (input.files && input.files[0]) {
+    const f = input.files[0];
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('msgAttachThumb').src = e.target.result;
+      document.getElementById('msgAttachName').textContent = f.name;
+      document.getElementById('msgAttachPreview').classList.remove('d-none');
+    };
+    reader.readAsDataURL(f);
+  }
+}
+function clearMsgAttach() {
+  document.getElementById('msgImageInput').value = '';
+  document.getElementById('msgAttachPreview').classList.add('d-none');
+  document.getElementById('msgAttachThumb').src = '';
+}
+
 function sendMessage() {
   const input   = document.getElementById('msgInput');
   const content = input.value.trim();
@@ -116,14 +152,16 @@ function sendMessage() {
   if (fileInp.files[0]) fd.append('image', fileInp.files[0]);
 
   input.value = '';
-  fileInp.value = '';
 
   fetch(BASE_URL + '/messages/send', { method:'POST', body:fd })
     .then(r => r.json()).then(data => {
       if (data.success) {
         document.getElementById('messages-container').insertAdjacentHTML('beforeend', data.html);
         lastMsgId = data.msg_id;
+        clearMsgAttach();
         scrollToBottom();
+      } else {
+        showToast(data.error || 'Не удалось отправить', 'danger');
       }
     });
 }

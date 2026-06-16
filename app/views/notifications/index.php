@@ -15,19 +15,26 @@
           'comment'        => 'comment',
           'friend_request',
           'friend_accept'  => 'friend',
+          'report'         => 'report',
+          'warning'        => 'warning',
           default          => 'default',
         };
         $icon = match($type) {
           'like'    => 'heart-fill',
           'comment' => 'chat-fill',
           'friend'  => 'person-check-fill',
+          'report'  => 'flag-fill',
+          'warning' => 'exclamation-triangle-fill',
           default   => 'bell-fill',
         };
-        $link = match($n['entity_type'] ?? '') {
-          'post' => BASE_URL . '/feed#post-' . $n['entity_id'],
-          'user' => BASE_URL . '/profile/' . $n['username'],
-          default => '#',
-        };
+        $link = ($n['type'] === 'report')
+          ? BASE_URL . '/admin/reports'
+          : match($n['entity_type'] ?? '') {
+              'post'  => BASE_URL . '/feed#post-' . $n['entity_id'],
+              'user'  => BASE_URL . '/profile/' . $n['username'],
+              'group' => BASE_URL . '/admin/reports',
+              default => '#',
+            };
       ?>
       <a href="<?= $link ?>" class="notif-item <?= !$n['is_read'] ? 'unread' : '' ?>">
         <div class="position-relative flex-shrink-0">

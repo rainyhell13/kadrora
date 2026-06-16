@@ -90,6 +90,7 @@ $router->post('/report',           'ReportController', 'create');
 $router->get('/admin',                   'AdminController', 'dashboard');
 $router->get('/admin/reports',           'AdminController', 'reports');
 $router->post('/admin/report/resolve',   'AdminController', 'resolveReport');
+$router->post('/admin/report/bulk',       'AdminController', 'bulkResolve');
 $router->get('/admin/users',             'AdminController', 'users');
 $router->post('/admin/user/action',      'AdminController', 'userAction');
 $router->get('/admin/content',           'AdminController', 'content');

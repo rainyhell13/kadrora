@@ -12,14 +12,16 @@
       <div class="card-body p-2">
         <?php foreach ($pending as $req): ?>
         <div class="d-flex align-items-center gap-3 p-2 rounded hover-bg" id="req-<?= $req['requester'] ?>">
+          <a href="<?= BASE_URL ?>/profile/<?= htmlspecialchars($req['username']) ?>" class="flex-shrink-0" title="Открыть профиль">
           <?php if ($req['avatar']): ?>
           <img src="<?= BASE_URL ?>/uploads/avatars/<?= htmlspecialchars($req['avatar']) ?>"
-               class="rounded-circle" width="52" height="52" style="object-fit:cover" alt="">
+               class="rounded-circle" width="52" height="52" style="object-fit:cover;cursor:pointer" alt="">
           <?php else: ?>
-          <div class="avatar-placeholder rounded-circle" style="width:52px;height:52px">
+          <div class="avatar-placeholder rounded-circle" style="width:52px;height:52px;cursor:pointer">
             <?= mb_strtoupper(mb_substr($req['first_name'],0,1)) ?>
           </div>
           <?php endif; ?>
+          </a>
           <div class="flex-grow-1">
             <a href="<?= BASE_URL ?>/profile/<?= htmlspecialchars($req['username']) ?>"
                class="fw-semibold text-dark text-decoration-none">

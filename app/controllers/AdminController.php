@@ -84,6 +84,36 @@ class AdminController extends Controller
         $this->json(['success' => true]);
     }
 
+    /** Массовое действие по выбранным жалобам */
+    public function bulkResolve(): void
+    {
+        $this->requireStaff();
+        $this->verifyCsrf();
+        $uid    = $this->currentUserId();
+        $action = $_POST['action'] ?? '';
+        $items  = json_decode($_POST['items'] ?? '[]', true);
+        if (!is_array($items) || empty($items)) { $this->json(['error' => 'Ничего не выбрано'], 422); return; }
+        if (!in_array($action, ['hide','remove','dismiss'], true)) { $this->json(['error' => 'Неверное действие'], 422); return; }
+
+        $db = Database::getConnection();
+        $done = 0;
+        foreach ($items as $it) {
+            $type = $it['type'] ?? ''; $id = (int)($it['id'] ?? 0);
+            if (!in_array($type, ['post','comment','user','group','message'], true) || $id < 1) continue;
+            if ($action === 'dismiss') {
+                $this->reportModel->resolveTarget($type, $id, $uid, 'rejected');
+            } else {
+                $status = $action === 'hide' ? 'hidden' : 'removed';
+                if ($type === 'post')    $db->prepare('UPDATE posts SET status=? WHERE id=?')->execute([$status, $id]);
+                if ($type === 'comment') $db->prepare('UPDATE comments SET status=? WHERE id=?')->execute([$status, $id]);
+                $this->reportModel->resolveTarget($type, $id, $uid, 'resolved');
+            }
+            $done++;
+        }
+        $this->logModel->add($uid, 'bulk_' . $action, null, null, "обработано: $done");
+        $this->json(['success' => true, 'count' => $done]);
+    }
+
     // ---------- ПОЛЬЗОВАТЕЛИ ----------
     public function users(): void
     {

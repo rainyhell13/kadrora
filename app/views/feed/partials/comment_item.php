@@ -22,6 +22,9 @@ $csrf = $csrf ?? $_SESSION['csrf_token'] ?? '';
       <?php if ((int)$comment['user_id'] === (int)$uid): ?>
       <button class="btn btn-link p-0 ms-2" style="font-size:.72rem;color:var(--danger);text-decoration:none"
               onclick="deleteComment(<?= $comment['id'] ?>)">удалить</button>
+      <?php else: ?>
+      <button class="btn btn-link p-0 ms-2" style="font-size:.72rem;color:var(--text-muted);text-decoration:none"
+              onclick="openReport('comment', <?= $comment['id'] ?>)" title="Пожаловаться">пожаловаться</button>
       <?php endif; ?>
     </div>
     <div class="text"><?= nl2br(htmlspecialchars($comment['content'])) ?></div>

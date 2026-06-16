@@ -89,6 +89,14 @@ class User extends Model
         return $r ? $r['role'] : 'user';
     }
 
+    /** ID всех модераторов и администраторов (для уведомлений) */
+    public function staffIds(): array
+    {
+        return array_map('intval', array_column(
+            $this->fetchAll("SELECT id FROM users WHERE role IN ('moderator','admin')"), 'id'
+        ));
+    }
+
     /** Активен ли бан (перманентный is_banned или временный banned_until) */
     public function isCurrentlyBanned(array $user): bool
     {

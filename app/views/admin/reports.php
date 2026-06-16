@@ -10,6 +10,22 @@ $typeNames = ['post'=>'Запись','comment'=>'Комментарий','user'=
   <p class="mb-0">Очередь жалоб пуста — нерассмотренных обращений нет.</p>
 </div>
 <?php else: ?>
+
+<!-- Панель массовых действий -->
+<div class="bulk-bar" id="bulkBar" style="display:none">
+  <span id="bulkCount" style="font-weight:600">Выбрано: 0</span>
+  <div class="d-flex gap-2 ms-auto">
+    <button class="btn btn-sm btn-warning" onclick="bulkAction('hide')"><i class="bi bi-eye-slash me-1"></i>Скрыть</button>
+    <button class="btn btn-sm btn-danger" onclick="bulkAction('remove')"><i class="bi bi-trash me-1"></i>Удалить</button>
+    <button class="btn btn-sm btn-outline-secondary" onclick="bulkAction('dismiss')"><i class="bi bi-check-lg me-1"></i>Отклонить</button>
+  </div>
+</div>
+<div class="mb-2">
+  <label style="font-size:.85rem;color:var(--text-muted);cursor:pointer">
+    <input type="checkbox" id="selAll" onchange="toggleAll(this)"> Выбрать все
+  </label>
+</div>
+
 <div class="d-flex flex-column gap-3">
   <?php foreach ($queue as $r):
     $p = $r['preview']; $type = $r['target_type']; $tid = (int)$r['target_id'];
@@ -18,6 +34,7 @@ $typeNames = ['post'=>'Запись','comment'=>'Комментарий','user'=
     <div class="card-body">
       <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
         <div>
+          <input type="checkbox" class="rep-check me-2" data-type="<?= $type ?>" data-id="<?= $tid ?>" onchange="updateBulk()">
           <span class="badge bg-secondary me-1"><?= $typeNames[$type] ?? $type ?></span>
           <?php foreach ($cats as $c): ?>
           <span class="badge bg-danger me-1"><?= $catNames[$c] ?? $c ?></span>
@@ -77,6 +94,31 @@ function resolveReport(type, id, action, btn) {
   postAction(BASE_URL + '/admin/report/resolve', { target_type: type, target_id: id, action: action }, () => {
     document.getElementById('report-' + type + '-' + id)?.remove();
     showToast(action === 'dismiss' ? 'Жалобы отклонены' : 'Контент обработан', 'success');
+    updateBulk();
+  });
+}
+
+function selectedItems() {
+  return [...document.querySelectorAll('.rep-check:checked')].map(c => ({ type: c.dataset.type, id: parseInt(c.dataset.id) }));
+}
+function updateBulk() {
+  const items = selectedItems();
+  document.getElementById('bulkCount').textContent = 'Выбрано: ' + items.length;
+  document.getElementById('bulkBar').style.display = items.length ? 'flex' : 'none';
+}
+function toggleAll(cb) {
+  document.querySelectorAll('.rep-check').forEach(c => c.checked = cb.checked);
+  updateBulk();
+}
+function bulkAction(action) {
+  const items = selectedItems();
+  if (!items.length) return;
+  if (action === 'remove' && !confirm('Удалить ' + items.length + ' объект(ов)?')) return;
+  postAction(BASE_URL + '/admin/report/bulk', { action: action, items: JSON.stringify(items) }, res => {
+    items.forEach(it => document.getElementById('report-' + it.type + '-' + it.id)?.remove());
+    document.getElementById('selAll').checked = false;
+    updateBulk();
+    showToast('Обработано: ' + res.count, 'success');
   });
 }
 </script>

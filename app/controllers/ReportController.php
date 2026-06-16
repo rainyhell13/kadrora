@@ -33,6 +33,19 @@ class ReportController extends Controller
         }
 
         $this->reportModel->create($uid, $type, $targetId, $category, $comment);
+
+        // Уведомить модераторов при первой жалобе на объект (без спама)
+        if (count($this->reportModel->getForTarget($type, $targetId)) === 1) {
+            $typeName = ['post'=>'запись','comment'=>'комментарий','user'=>'пользователя','group'=>'сообщество','message'=>'сообщение'][$type] ?? 'объект';
+            $notif = new Notification();
+            $me    = (new User())->findById($uid);
+            foreach ((new User())->staffIds() as $sid) {
+                if ($sid === $uid) continue;
+                $notif->create($sid, $uid, 'report',
+                    "{$me['first_name']} {$me['last_name']} пожаловался(ась) на $typeName", $targetId, $type);
+            }
+        }
+
         $this->json(['success' => true]);
     }
 }
