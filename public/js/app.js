@@ -101,6 +101,16 @@ function deleteComment(id) {
   });
 }
 
+function likeComment(id, btn) {
+  postAction(BASE_URL + '/comment/like', { comment_id: id }, res => {
+    btn.classList.toggle('liked', res.liked);
+    const icon = btn.querySelector('i');
+    if (icon) icon.className = 'bi bi-heart' + (res.liked ? '-fill' : '');
+    const c = btn.querySelector('.clike-count');
+    if (c) c.textContent = res.count > 0 ? res.count : '';
+  });
+}
+
 /* ---- Friends ---- */
 function sendFriendRequest(userId, btn) {
   postAction(BASE_URL + '/friend/add', { user_id: userId }, () => {

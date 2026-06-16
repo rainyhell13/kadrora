@@ -103,6 +103,12 @@ class ProfileController extends Controller
             $this->json(['error' => 'Запись не может быть пустой'], 422);
             return;
         }
+        // Модерация
+        if ($this->isMuted()) { $this->json(['error' => 'Вам временно запрещена публикация'], 403); return; }
+        if ($content !== '') {
+            $hit = $this->moderateText($content);
+            if ($hit && $hit['action'] === 'block') { $this->json(['error' => 'Запись содержит недопустимое содержимое'], 422); return; }
+        }
 
         $image = null;
         if (!empty($_FILES['image']['name'])) {

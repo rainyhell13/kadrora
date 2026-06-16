@@ -2,17 +2,29 @@
 
 class Comment extends Model
 {
-    public function getByPost(int $postId): array
+    public function getByPost(int $postId, int $viewerId = 0): array
     {
         return $this->fetchAll(
             "SELECT c.*, u.username, u.first_name, u.last_name, u.avatar,
-                    (SELECT COUNT(*) FROM comment_likes cl WHERE cl.comment_id = c.id) AS likes_count
+                    (SELECT COUNT(*) FROM comment_likes cl WHERE cl.comment_id = c.id) AS likes_count,
+                    EXISTS(SELECT 1 FROM comment_likes cl2 WHERE cl2.comment_id = c.id AND cl2.user_id = ?) AS liked_by_me
              FROM comments c
              JOIN users u ON u.id = c.user_id
              WHERE c.post_id = ? AND c.parent_id IS NULL AND c.status NOT IN ('hidden','removed')
              ORDER BY c.created_at ASC",
-            [$postId]
+            [$viewerId, $postId]
         );
+    }
+
+    public function getLikesCount(int $commentId): int
+    {
+        $r = $this->fetchOne('SELECT COUNT(*) AS c FROM comment_likes WHERE comment_id = ?', [$commentId]);
+        return $r ? (int)$r['c'] : 0;
+    }
+
+    public function isLikedBy(int $commentId, int $userId): bool
+    {
+        return (bool)$this->fetchOne('SELECT 1 FROM comment_likes WHERE comment_id = ? AND user_id = ?', [$commentId, $userId]);
     }
 
     public function getReplies(int $parentId): array

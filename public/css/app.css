@@ -968,3 +968,15 @@ a.text-dark:hover { color: var(--accent) !important; }
 /* Иконки уведомлений модерации */
 .notif-icon.report  { background: rgba(240,98,146,.15); color: var(--danger); }
 .notif-icon.warning { background: rgba(246,195,68,.15); color: var(--warning); }
+
+/* ---- Лайк комментария (как в старом ВК) ---- */
+.comment-like-btn {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-size: .72rem; color: var(--text-muted);
+  display: inline-flex; align-items: center; gap: 3px;
+  transition: color .15s;
+}
+.comment-like-btn:hover { color: var(--danger); }
+.comment-like-btn.liked { color: var(--danger); }
+.comment-like-btn .clike-count { font-weight: 600; }
+.comment-like-btn .clike-count:empty { display: none; }

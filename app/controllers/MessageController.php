@@ -36,9 +36,10 @@ class MessageController extends Controller
         ]);
     }
 
-    public function conversation(int $targetUserId): void
+    public function conversation($targetUserId): void
     {
         $this->requireAuth();
+        $targetUserId = (int)$targetUserId;
         $uid    = $this->currentUserId();
         $target = $this->userModel->findById($targetUserId);
 

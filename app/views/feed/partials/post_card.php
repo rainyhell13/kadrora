@@ -1,6 +1,11 @@
 <?php
 $uid  = $uid  ?? $_SESSION['user_id']    ?? 0;
 $csrf = $csrf ?? $_SESSION['csrf_token'] ?? '';
+// Нормализация ключей — карточка устойчива к любому источнику данных
+$post['liked_by_me']      = $post['liked_by_me']      ?? false;
+$post['bookmarked_by_me'] = $post['bookmarked_by_me'] ?? false;
+$post['comments_count']   = $post['comments_count']   ?? 0;
+$post['likes_count']      = $post['likes_count']      ?? 0;
 ?>
 <div class="post-card" id="post-<?= $post['id'] ?>">
 

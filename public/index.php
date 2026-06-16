@@ -50,6 +50,7 @@ $router->post('/post/like',        'FeedController', 'likePost');
 // Comments
 $router->post('/comment/create',   'CommentController', 'create');
 $router->post('/comment/delete',   'CommentController', 'delete');
+$router->post('/comment/like',     'CommentController', 'like');
 $router->get('/comment/list',      'CommentController', 'getByPost');
 
 // Profile

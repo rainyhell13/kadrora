@@ -82,9 +82,10 @@ class DocumentController extends Controller
         $this->redirect('/documents');
     }
 
-    public function download(int $id): void
+    public function download($id): void
     {
         $this->requireAuth();
+        $id  = (int)$id;
         $doc = $this->docModel->findById($id);
         if (!$doc) {
             http_response_code(404);

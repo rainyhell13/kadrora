@@ -2,6 +2,8 @@
 $uid     = $uid     ?? $_SESSION['user_id']    ?? 0;
 $csrf    = $csrf    ?? $_SESSION['csrf_token'] ?? '';
 $isAdmin = $isAdmin ?? false;
+$post['liked_by_me'] = $post['liked_by_me'] ?? false;
+$post['likes_count'] = $post['likes_count'] ?? 0;
 ?>
 <div class="post-card" id="gpost-<?= $post['id'] ?>">
   <div class="post-header">

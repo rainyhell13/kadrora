@@ -19,6 +19,12 @@ $csrf = $csrf ?? $_SESSION['csrf_token'] ?? '';
         <?= htmlspecialchars($comment['first_name'] . ' ' . $comment['last_name']) ?>
       </a>
       <span style="color:var(--text-muted);font-size:.72rem;margin-left:6px"><?= timeAgo($comment['created_at']) ?></span>
+      <?php $cLiked = !empty($comment['liked_by_me']); $cLikes = (int)($comment['likes_count'] ?? 0); ?>
+      <button class="comment-like-btn ms-2 <?= $cLiked ? 'liked' : '' ?>" id="clike-<?= $comment['id'] ?>"
+              onclick="likeComment(<?= $comment['id'] ?>, this)" title="Нравится">
+        <i class="bi bi-heart<?= $cLiked ? '-fill' : '' ?>"></i>
+        <span class="clike-count"><?= $cLikes > 0 ? $cLikes : '' ?></span>
+      </button>
       <?php if ((int)$comment['user_id'] === (int)$uid): ?>
       <button class="btn btn-link p-0 ms-2" style="font-size:.72rem;color:var(--danger);text-decoration:none"
               onclick="deleteComment(<?= $comment['id'] ?>)">удалить</button>

@@ -79,13 +79,29 @@ class CommentController extends Controller
         }
     }
 
+    public function like(): void
+    {
+        $this->requireAuth();
+        $this->verifyCsrf();
+        $uid       = $this->currentUserId();
+        $commentId = (int)($_POST['comment_id'] ?? 0);
+        if (!$this->commentModel->findById($commentId)) {
+            $this->json(['error' => 'Комментарий не найден'], 404);
+            return;
+        }
+        $liked = $this->commentModel->isLikedBy($commentId, $uid);
+        if ($liked) $this->commentModel->unlike($commentId, $uid);
+        else        $this->commentModel->like($commentId, $uid);
+        $this->json(['success' => true, 'liked' => !$liked, 'count' => $this->commentModel->getLikesCount($commentId)]);
+    }
+
     public function getByPost(): void
     {
         $this->requireAuth();
         $uid    = $this->currentUserId();
         $postId = (int)($_GET['post_id'] ?? 0);
 
-        $comments = $this->commentModel->getByPost($postId);
+        $comments = $this->commentModel->getByPost($postId, $uid);
         $html     = '';
         foreach ($comments as $comment) {
             $html .= $this->renderView('feed/partials/comment_item', [

@@ -34,6 +34,12 @@ $theyAsked= $isPending && (int)$fs['addressee'] === (int)$me['id'];
           <div>
             <h2 class="profile-name mb-0">
               <?= htmlspecialchars($profile['first_name'] . ' ' . $profile['last_name']) ?>
+              <?php if (!empty($profile['is_verified'])): ?>
+              <i class="bi bi-patch-check-fill" style="color:var(--accent);font-size:1.1rem;vertical-align:middle" title="Подтверждённый профиль"></i>
+              <?php endif; ?>
+              <?php if (!empty($profile['role']) && $profile['role'] !== 'user'): ?>
+              <span class="badge bg-primary ms-1" style="font-size:.6rem;vertical-align:middle"><?= $profile['role']==='admin'?'Администратор':'Модератор' ?></span>
+              <?php endif; ?>
               <?php if ($profile['is_online']): ?>
               <span class="badge bg-success ms-1" style="font-size:.6rem;vertical-align:middle">онлайн</span>
               <?php endif; ?>
